@@ -3,6 +3,10 @@ package cleancode.minesweeper.tobe;
 import java.util.Arrays;
 import java.util.Random;
 
+import cleancode.minesweeper.tobe.cell.Cell;
+import cleancode.minesweeper.tobe.cell.EmptyCell;
+import cleancode.minesweeper.tobe.cell.LandMineCell;
+import cleancode.minesweeper.tobe.cell.NumberCell;
 import cleancode.minesweeper.tobe.gamelevel.GameLevel;
 
 public class GameBoard {
@@ -25,14 +29,15 @@ public class GameBoard {
 
 		for (int row = 0; row < rowSize; row++) {
 			for (int col = 0; col < colSize; col++) {
-				board[row][col] = Cell.create();
+				board[row][col] = new EmptyCell();
 			}
 		}
 
 		for (int i = 0; i < landMineCount; i++) {
 			int landMineCol = new Random().nextInt(colSize);
 			int landMineRow = new Random().nextInt(rowSize);
-			findCell(landMineRow, landMineCol).turnOnLandMine();
+
+			board[landMineRow][landMineCol] = new LandMineCell();
 		}
 
 		for (int row = 0; row < rowSize; row++) {
@@ -40,8 +45,13 @@ public class GameBoard {
 				if (isLandMineCell(row, col)) {
 					continue;
 				}
+
 				int count = countNearbyLandMines(row, col);
-				findCell(row, col).updateNearbyLandMineCount(count);
+				if (count == 0) {
+					continue;
+				}
+
+				board[row][col] = new NumberCell(count);
 			}
 		}
 	}
